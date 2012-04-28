@@ -3,8 +3,8 @@
 #include <stdio.h>
 
 #include <iostream>
-static char errorBuffer[CURL_ERROR_SIZE];
 
+static char errorBuffer[CURL_ERROR_SIZE];
 typedef size_t (*write_callback)(void *ptr, size_t size, size_t nmemb, void *stream);
 //curl  Ïà¹Ø
 size_t write_file(void *ptr, size_t size, size_t nmemb, void *stream){
@@ -91,7 +91,7 @@ int download_file(Event *event) {
 sp_thread_result_t SP_THREAD_CALL http_request_thread(void *arg)
 {
     while (HTTPRequest::instance()->is_running()) {
-        Event *event = EventManager::instance()->pop_wait_event();
+        Event *event =  HTTPRequest::instance()->get_event().pop_wait_event();
         if(event) {
             int ret = -1;
             if (event->type == EVENT_REQUET_DATA) {
@@ -101,11 +101,11 @@ sp_thread_result_t SP_THREAD_CALL http_request_thread(void *arg)
                 ret = download_file(event);
             }
             if (ret == 0) {
-                EventManager::instance()->push_complete_event(event);
+                HTTPRequest::instance()->get_event().push_complete_event(event);
             }
             else {
                 event->str_data = errorBuffer;
-                EventManager::instance()->push_error_event(event);
+                HTTPRequest::instance()->get_event().push_error_event(event);
             }   
         }
         else {
@@ -117,6 +117,8 @@ sp_thread_result_t SP_THREAD_CALL http_request_thread(void *arg)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 DECLARE_SINGLETON_CLASS(HTTPRequest)
+EventManager HTTPRequest::event_manager_;
+
 int HTTPRequest::send_request(int type, const char *strurl, const char *strsave, REQUEST_CALLBACK oncomplete, REQUEST_CALLBACK onerror) {
     Event *event = new Event;
     event->type = type;
@@ -128,13 +130,13 @@ int HTTPRequest::send_request(int type, const char *strurl, const char *strsave,
     }
     event->on_complete = oncomplete;
     event->on_error = onerror;
-    EventManager::instance()->push_wait_event(event);
+    HTTPRequest::instance()->get_event().push_wait_event(event);
     return 0;
 }
 
 int HTTPRequest::dispatch() {
     int ret = 0;
-    Event *event = EventManager::instance()->pop_completer_event();
+    Event *event = HTTPRequest::instance()->get_event().pop_completer_event();
     if (event) {
         if (event->on_complete) {
             (event->on_complete)(event->str_url, event->str_data);
@@ -142,7 +144,7 @@ int HTTPRequest::dispatch() {
         ret++;
         delete event;
     }
-    event = EventManager::instance()->pop_error_event();
+    event = HTTPRequest::instance()->get_event().pop_error_event();
     if (event) {
         if ( event->on_error) {
             (event->on_error)(event->str_url, event->str_data);
@@ -158,7 +160,6 @@ int HTTPRequest::run() {
     if  (running_) {
         return ret;
     }
-    EventManager::instance();
     curl_global_init(CURL_GLOBAL_ALL);
     running_ = true;
     sp_thread_attr_t attr;

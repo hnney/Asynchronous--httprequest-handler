@@ -45,7 +45,7 @@ public:
 };
 
 //thread safe
-class EventManager : public Singleton<EventManager> {
+class EventManager {
 private:
     std::deque <Event *>    wait_queue_;
     std::deque <Event *>    error_queue_;

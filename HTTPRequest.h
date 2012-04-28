@@ -17,11 +17,20 @@ public:
     int run();
     void stop();
 
-    //@brief: push http request into EventManager
+    /*
+    * @brief: push http request event  
+    */
     int send_request(int type, const char *strurl, const char *strsave, REQUEST_CALLBACK oncomplete, REQUEST_CALLBACK onerror);
+
+    static EventManager& get_event() {
+        return event_manager_;
+    }
+
 private:
     bool     running_;
     int      timeout_;
+
+    static   EventManager   event_manager_;
 };
 
 #endif //_HTTPREQUEST_H__

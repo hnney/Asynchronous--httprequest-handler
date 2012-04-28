@@ -21,7 +21,7 @@ void error(std::string &strurl, string &data) {
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-//    HTTPRequest::instance()->set_timeout();
+//  HTTPRequest::instance()->set_timeout(500);
     HTTPRequest::instance()->run();
     HTTPRequest::instance()->send_request(EVENT_REQUET_DATA, "http://www.baidu.com", NULL,  complete, error);
     HTTPRequest::instance()->send_request(EVENT_DOWNLOAD_FILE, "http://www.baidu.com/", "baidu.html",  complete, error);

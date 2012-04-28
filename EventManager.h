@@ -4,7 +4,7 @@
 #include <deque>
 #include <string>
 #include "Singleton.h"
-#include "pthread.h"
+#include "mypthread.h"
 
 typedef void (*REQUEST_CALLBACK) (std::string &strurl,std::string &strdata);
 typedef void (*REQUEST_CALLBACK) (std::string &strurl, std::string &strdata);

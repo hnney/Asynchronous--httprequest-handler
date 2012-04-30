@@ -3,7 +3,6 @@
 #ifdef WIN32
 
 
-
 int sp_thread_mutex_init( sp_thread_mutex_t * mutex, void * attr )
 {
 	*mutex = CreateMutex( NULL, FALSE, NULL );

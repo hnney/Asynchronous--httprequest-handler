@@ -20,7 +20,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 }
 
 int use_curl(Event *event, write_callback callback, void *stream) {
-    CURLcode code = CURLE_OK;
+    CURLcode code = -1;
     CURL *curl = curl_easy_init();
     do {
         if (!curl) {       
